@@ -5,13 +5,24 @@ kind: Deployment
 metadata:
   name: db-deployment
   labels:
-    type: deplyment
+    type: deployment
     use: db
     env: dev
 
 spec:
-  containers:
-    - name: mongo-db-container
-      image: mongo:latest
-      ports:
-        - containerPort: 27017
+  replicas: 1
+  selector:
+    matchLabels:
+      type: mongoDB
+      env: dev
+  template:
+    metadata:
+      name: mongo-db
+      labels:
+        type: mongoDB
+        env: dev
+    containers:
+      - name: mongo-db-container
+        image: mongo:latest
+        ports:
+          - containerPort: 27017
