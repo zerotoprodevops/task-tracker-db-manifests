@@ -27,3 +27,75 @@ spec:
           image: mongo:latest
           ports:
             - containerPort: 27017
+              name: "dev-db-port"
+          volumeMounts:
+            - name: "mongo-Data-Storage"
+              mountPath: "/data/db"
+      volumes:
+        - name: "mongo-Data-Storage"
+          persistentVolumeClaim:
+            claimName: dev-db-pvc-01      
+---
+#create service for MongoDB
+apiVersion: v1
+
+kind: Service
+
+metadata:
+  name: mongo-service
+spec:
+  type: ClusterIP
+  ports:
+    - name: db-svc-Port
+      protocol: TCP
+      port: 27017
+      targetPort: "dev-db-port"
+  selector:
+    type: mongoDB
+    env: dev
+
+
+
+
+---
+#create PV
+apiVersion: v1 
+
+kind: PersistentVolume  
+
+metadata:
+  name:  dev-db-pv-vol-01
+  labels:
+    release: "stable"
+    environment: "dev"
+
+spec:
+  capacity:
+    storage:  1Gi
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  storageClassName: slow-local
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: "/mnt/data/dev-mongo-db-vol-01"
+    type: DirectoryOrCreate    
+
+# Create PVC
+---
+apiVersion: v1
+kind: PersistentVolumeClaim 
+metadata:
+  name: dev-db-pvc-01
+spec:  
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: slow-local
+  selector:
+    matchLabels:  
+      release: "stable"
+      environment: "dev"  
