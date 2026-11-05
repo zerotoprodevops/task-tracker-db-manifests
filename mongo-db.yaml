@@ -4,6 +4,7 @@ kind: Deployment
 
 metadata:
   name: db-deployment
+  namespace: dev
   labels:
     type: deployment
     use: db
@@ -43,6 +44,7 @@ kind: Service
 
 metadata:
   name: mongo-service
+  namespace: dev
 spec:
   type: ClusterIP
   ports:
@@ -87,6 +89,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim 
 metadata:
   name: dev-db-pvc-01
+  namespace: dev
 spec:  
   accessModes:
     - ReadWriteOnce
